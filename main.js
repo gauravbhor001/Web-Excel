@@ -91,7 +91,7 @@ function renderTable(data, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = "";
   if (!data.length) {
-    container.innerHTML = "<p class='text-muted'>No data found.</p>";
+    container.innerHTML = "<p class='text-muted text-center'>No data found.</p>";
     return;
   }
   const tableHtml = `<div class="table-responsive">
