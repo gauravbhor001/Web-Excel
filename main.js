@@ -97,17 +97,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     ).join("");
   }
 
-  function renderSelectedTable() {
-    if (selectedParts.length === 0) {
-      renderTable([], "search-data-container");
-      return;
-    }
-
-    const filtered = allData
-      .filter(row => selectedParts.includes(row["Part No"]));
-
-    renderTable(filtered, "search-data-container");
+function renderSelectedTable() {
+  if (selectedParts.length === 0) {
+    renderTable([], "search-data-container");
+    return;
   }
+
+  const partMap = Object.fromEntries(allData.map(row => [row["Part No"], row]));
+  const filtered = selectedParts.map(partNo => partMap[partNo]).filter(Boolean);
+
+  renderTable(filtered, "search-data-container");
+}
 });
 
 function renderTable(data, containerId) {
@@ -120,7 +120,7 @@ function renderTable(data, containerId) {
   }
 
   const originalHeaders = Object.keys(data[0]);
-  const allHeaders = [...originalHeaders, "Quantity", "Final Price"];
+  const allHeaders = ["S.No", ...originalHeaders, "Quantity", "Final Price"];
 
   const tableHtml = `<div class="table-responsive">
     <table class="table table-bordered table-hover table-striped align-middle shadow-sm mb-0">
@@ -148,6 +148,7 @@ function renderTable(data, containerId) {
           }).join("");
 
           return `<tr data-index="${index}">
+            <td class="text-center">${index + 1}</td>
             ${rowHtml}
             <td class="text-end">
               <input type="number" min="0" step="1" value="${quantity}" 
@@ -163,7 +164,7 @@ function renderTable(data, containerId) {
 
   container.innerHTML = tableHtml;
 
-  // Event listeners for quantity updates
+  // Quantity event listeners (unchanged)
   document.querySelectorAll(".quantity-input").forEach((input) => {
     input.addEventListener("input", (e) => {
       const index = e.target.dataset.index;
@@ -171,15 +172,11 @@ function renderTable(data, containerId) {
       const quantity = parseFloat(e.target.value) || 0;
       const cubixLP = parseFloat(e.target.dataset.cubix) || 0;
       const final = (cubixLP * quantity).toFixed(2);
-
       document.getElementById(`final-${index}`).textContent = final;
-
-      selectedProductData[partNo] = {
-        Quantity: quantity,
-        Price: parseFloat(final)
-      };
+      selectedProductData[partNo] = { Quantity: quantity, Price: parseFloat(final) };
     });
   });
+
 
   // Add Checkout Button
   if (data.length) {
