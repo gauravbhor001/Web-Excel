@@ -114,7 +114,6 @@ searchInput.addEventListener("input", function () {
         const partNo = row["Part No"];
         return {
           ...row,
-          Quantity: selectedProductData[partNo]?.Quantity || 1,
           Price: selectedProductData[partNo]?.Price || (parseFloat(row["CUBIX LP"]) || 0)
         };
       });
