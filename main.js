@@ -217,7 +217,7 @@ function renderTable(data, containerId) {
 function openPopupWithData(data) {
   const overlay = document.getElementById("popup-overlay");
   const tableContainer = document.getElementById("popup-table-container");
-  const popupColumns = ["Part No", "SMC LP", "CUBIX LP", "Quantity", "Price"];
+  const popupColumns = ["Part No", "CUBIX LP", "Quantity", "Price"];
 
   tableContainer.innerHTML = `<div class="table-responsive">
     <table class="table table-bordered table-sm align-middle mb-0">
