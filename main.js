@@ -43,7 +43,7 @@ searchInput.addEventListener("input", function () {
         partNo &&
         partNo.toLowerCase().startsWith(value) &&
         !selectedParts.includes(partNo)
-      );~
+      );
     })
     .map(row => row["Part No"])
     .filter((v, i, arr) => arr.indexOf(v) === i) // unique
