@@ -4,7 +4,7 @@ let selectedParts = [];
 let selectedProductData = {}; // Tracks quantity and price per part
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const response = await fetch("smc_products.csv");
+  const response = await fetch("Products-new.csv");
   const csvText = await response.text();
   const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
 
@@ -119,7 +119,7 @@ function renderTable(data, containerId) {
     return;
   }
 
-  const originalHeaders = Object.keys(data[0]);
+  const originalHeaders = Object.keys(data[0]).slice(0, 3);
   const allHeaders = ["S.No", ...originalHeaders, "Quantity", "Final Price"];
 
   const tableHtml = `<div class="table-responsive">
@@ -134,7 +134,7 @@ function renderTable(data, containerId) {
           const partNo = row["Part No"];
           const saved = selectedProductData[partNo] || {};
           const quantity = saved.Quantity || 1;
-          const cubixLP = parseFloat(row["CUBIX LP"]) || 0;
+          const cubixLP = parseFloat(row["MRP"]) || 0;
           const finalPrice = (cubixLP * quantity).toFixed(2);
 
           const rowHtml = originalHeaders.map(h => {
@@ -190,7 +190,7 @@ function renderTable(data, containerId) {
         return {
           ...row,
           Quantity: selectedProductData[partNo]?.Quantity || 1,
-          Price: selectedProductData[partNo]?.Price || (parseFloat(row["CUBIX LP"]) || 0)
+          Price: selectedProductData[partNo]?.Price || (parseFloat(row["MRP"]) || 0)
         };
       });
       openPopupWithData(updatedData);
@@ -203,7 +203,7 @@ function renderTable(data, containerId) {
 function openPopupWithData(data) {
   const overlay = document.getElementById("popup-overlay");
   const tableContainer = document.getElementById("popup-table-container");
-  const popupColumns = ["Part No", "CUBIX LP", "Quantity", "Price"];
+  const popupColumns = ["Part No", "MRP","Description", "Quantity", "Price"];
 
   const totalPrice = data.reduce((sum, row) => sum + (parseFloat(row.Price) || 0), 0);
 
@@ -245,18 +245,17 @@ function openPopupWithData(data) {
     if (!fileName) fileName = "quantities";
     fileName = fileName.replace(/[^a-zA-Z0-9_\-]/g, "_") + ".csv";
 
-    const csvHeaders = ["Part No", "CUBIX LP", "Quantity", "Price"];
+    const csvHeaders = ["Part No", "MRP", "Description", "Quantity", "Price","Discount %"];
     const discountPercent = parseFloat(discountInput.value) || 0;
     const finalPrice = totalPrice * (1 - discountPercent / 100);
-
     const csvRows = [
       csvHeaders.join(","),
       ...data.map(row =>
-        csvHeaders.map(h => `"${(row[h] ?? "").toString().replace(/"/g, '""')}"`).join(",")
+        csvHeaders.map(h => `"${(row[h] ?? "").toString().replace(/"/g, '""')}"`).join(",") + `${discountPercent.toFixed(2)}`
       ),
-      `,,Total,"${totalPrice.toFixed(2)}"`,
-      `,,Discount %,"${discountPercent.toFixed(2)}"`,
-      `,,Final Total,"${finalPrice.toFixed(2)}"`
+      `,,,Total,"${totalPrice.toFixed(2)}"`,
+      `,,,Discount %,"${discountPercent.toFixed(2)}"`,
+      `,,,Final Total,"${finalPrice.toFixed(2)}"`
     ];
 
     const csvContent = csvRows.join("\r\n");
